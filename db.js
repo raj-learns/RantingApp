@@ -1,5 +1,7 @@
+
 import mongoose from 'mongoose';
 // const { MongoClient, ServerApiVersion } = require('mongodb');
+
 
 const uri = "mongodb+srv://2022ceb1025_db_user:Raghukul%402004@cluster0.tfn7sfq.mongodb.net/?appName=Cluster0";
 
@@ -11,9 +13,13 @@ const uri = "mongodb+srv://2022ceb1025_db_user:Raghukul%402004@cluster0.tfn7sfq.
 //         deprecationErrors: true,
 //     }
 // });
-await mongoose.connect(uri);
+mongoose.connect(uri).then(() => {
+    console.log("MongoDB connected successfully");
+}).catch((err) => {
+    console.error("MongoDB connection error:", err);
+});
 //await mongoose.connect("mongodb+srv://2022ceb1025_db_user:Raghukul%402004@cluster0.tfn7sfq.mongodb.net/my_database?retryWrites=true&w=majority");
-console.log("Connected to MongoDB using Mongoose");
+
 
 // async function run() {
 //     try {
@@ -28,3 +34,4 @@ console.log("Connected to MongoDB using Mongoose");
 //     }
 // }
 // run().catch(console.dir);
+
