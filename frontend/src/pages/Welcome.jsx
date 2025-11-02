@@ -29,7 +29,7 @@ const Welcome = () => {
           textShadow: "2px 2px 10px rgba(0,0,0,0.4)",
         }}
       >
-        Welcome to <span style={{ color: "#90caf9" }}>Ranting App</span>
+        Welcome to <span style={{ color: "#90caf9" }}>Progress App</span>
       </Typography>
 
       <Typography
@@ -41,9 +41,9 @@ const Welcome = () => {
           color: "#f1f1f1",
         }}
       >
-        Share your thoughts, express your ideas, and connect with others.
+        Create your plans, your tasks, and track it in real time. Because to beat everyone, you need something special.
         <br />
-        Your voice deserves to be heard.
+        Your journey begins here.
       </Typography>
 
       <Button
@@ -65,7 +65,7 @@ const Welcome = () => {
           },
         }}
       >
-        Get Started 🚀
+        Chalo Phodte hain!
       </Button>
     </Box>
   );

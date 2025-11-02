@@ -171,7 +171,7 @@ const Login = () => {
                         You have successfully logged in.
                     </Typography>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        To continue, please proceed to create a post. We are excited to have you back!
+                        To continue, please proceed to create a plan. We are excited to have you back!
                     </Typography>
                     <Button
                         variant="contained"
@@ -181,20 +181,20 @@ const Login = () => {
                             navigate('/createpost');
                         }}
                     >
-                        Create Post
+                        Create Plan
                     </Button>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        Or directly jump to your posts page.
+                        Or directly jump to your today's plan.
                     </Typography>
                     <Button
                         variant="contained"
                         sx={{ mt: 2, backgroundColor: '#5c9117ff', '&:hover': { backgroundColor: '#0d47a1' } }}
                         onClick={() => {
                             handleClose();
-                            navigate('/myposts');
+                            navigate('/todayplan');
                         }}
                     >
-                        My Posts
+                        My Today's Plan
                     </Button>
                 </Box>
             </Modal>
