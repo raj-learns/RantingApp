@@ -278,4 +278,5 @@ app.get('/api/myposts', async (req, res) => {
         return res.status(401).json({ message: "Yo man! we don't know you. Please login" });
     }
 })
-app.listen(4000, () => console.log('Server running on port 4000'));
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
