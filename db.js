@@ -1,9 +1,10 @@
 
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 // const { MongoClient, ServerApiVersion } = require('mongodb');
 
-
-const uri = "mongodb+srv://2022ceb1025_db_user:Raghukul%402004@cluster0.tfn7sfq.mongodb.net/?appName=Cluster0";
+dotenv.config();
+const uri = process.env.MONGO_URI;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 // const client = new MongoClient(uri, {
