@@ -107,7 +107,7 @@ app.post('/api/plan', async (req, res) => {
         if (planDate >= todayStart && planDate <= todayEnd) {
             if (user.currentPlan) updates.lastPlan = user.currentPlan;
             updates.currentPlan = newPlan._id;
-            updates.nextPlan = user.nextPlan; 
+            updates.nextPlan = user.nextPlan;
         }
         else if (planDate > todayEnd) {
             updates.nextPlan = newPlan._id;
@@ -133,6 +133,37 @@ app.post('/api/plan', async (req, res) => {
     } catch (err) {
         console.error('Error creating plan:', err);
         return res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.post("/api/follow/:userId", async (req, res) => {
+    try {
+        const decoded = jwt.verify(req.headers.token, "secret-key");
+        if (!decoded) return res.status(401).json({ message: "Invalid token" });
+
+        const targetUserId = req.params.userId;
+        if (decoded._id === targetUserId)
+            return res.status(400).json({ message: "You can’t follow yourself" });
+
+        const user = await User.findById(decoded._id);
+        const targetUser = await User.findById(targetUserId);
+
+        if (!targetUser) return res.status(404).json({ message: "User not found" });
+
+        const isAlreadyFollowing = user.following.includes(targetUserId);
+
+        if (isAlreadyFollowing) {
+            await User.findByIdAndUpdate(decoded._id, { $pull: { following: targetUserId } });
+            await User.findByIdAndUpdate(targetUserId, { $pull: { followers: decoded._id } });
+            return res.status(200).json({ message: `Unfollowed ${targetUser.name}` });
+        } else {
+            await User.findByIdAndUpdate(decoded._id, { $addToSet: { following: targetUserId } });
+            await User.findByIdAndUpdate(targetUserId, { $addToSet: { followers: decoded._id } });
+            return res.status(200).json({ message: `You are now following ${targetUser.name}` });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
     }
 });
 
