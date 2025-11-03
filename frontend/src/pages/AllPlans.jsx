@@ -81,7 +81,7 @@ const AllPlans = () => {
                         <Button
                             variant="outlined"
                             color="primary"
-                            onClick={() => navigate("/createplan")}
+                            onClick={() => navigate("/createpost")}
                         >
                             + Create New Plan
                         </Button>
