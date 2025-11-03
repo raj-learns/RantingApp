@@ -28,6 +28,7 @@ const AllPlans = () => {
                     headers: { token },
                 });
                 const data = await res.json();
+                console.log("Fetched Plans:", data);
                 if (res.ok) setPlans(data.plans);
             } catch (error) {
                 console.error("Error fetching plans:", error);
@@ -179,7 +180,7 @@ const AllPlans = () => {
                                                 {task.description}
                                             </Typography>
                                             <Typography variant="body2" color="textSecondary">
-                                                Duration: {task.duration || "N/A"} mins
+                                                Duration: {task.expectedDuration || "N/A"} hours
                                             </Typography>
                                             <Typography variant="body2" color="textSecondary">
                                                 Field: {task.field}
