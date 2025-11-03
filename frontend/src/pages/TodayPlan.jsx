@@ -82,17 +82,21 @@ const TodayPlan = () => {
 
     if (!plan)
         return (
-            <Typography
-                variant="h5"
-                align="center"
-                sx={{ mt: 10, color: "#777" }}
-            >
-                No plan found for today. Create one to get started!
-            </Typography>
+            <>
+                <TopBar />
+                <Typography
+                    variant="h5"
+                    align="center"
+                    sx={{ mt: 10, color: "#777" }}
+                >
+                    No plan found for today. Create one to get started!
+                </Typography>
+            </>
         );
 
     return (
-        <><TopBar />
+        <>
+            <TopBar />
             <Box
                 sx={{
                     display: "flex",
