@@ -7,7 +7,7 @@ const UserPosts = () => {
     const fetchPosts = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:4000/api/myposts', {
+        const res = await fetch('https://rantingapp.onrender.com/api/myposts', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

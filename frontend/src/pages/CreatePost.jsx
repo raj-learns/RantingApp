@@ -18,7 +18,7 @@ const CreatePlan = ({ mode }) => {
         if (mode === 'edit' && id) {
             const fetchPlan = async () => {
                 const token = localStorage.getItem('token');
-                const res = await fetch(`http://localhost:4000/api/plan/${id}`, {
+                const res = await fetch(`https://rantingapp.onrender.com/api/plan/${id}`, {
                     headers: { token },
                 });
                 const data = await res.json();
@@ -37,7 +37,7 @@ const CreatePlan = ({ mode }) => {
         const fetchPlannedDates = async () => {
             const token = localStorage.getItem('token');
             try {
-                const res = await fetch('http://localhost:4000/api/myplans', {
+                const res = await fetch('https://rantingapp.onrender.com/api/myplans', {
                     headers: { 'token': token }
                 });
                 const data = await res.json();
@@ -82,8 +82,8 @@ const CreatePlan = ({ mode }) => {
         try {
             const url =
                 mode === 'edit'
-                    ? `http://localhost:4000/api/plan/${id}`
-                    : 'http://localhost:4000/api/plan';
+                    ? `https://rantingapp.onrender.com/api/plan/${id}`
+                    : 'https://rantingapp.onrender.com/api/plan';
             const method = mode === 'edit' ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,

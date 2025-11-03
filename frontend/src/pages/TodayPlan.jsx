@@ -22,7 +22,7 @@ const TodayPlan = () => {
         const fetchTodayPlan = async () => {
             const token = localStorage.getItem("token");
             try {
-                const res = await fetch("http://localhost:4000/api/plan/today", {
+                const res = await fetch("https://rantingapp.onrender.com/api/plan/today", {
                     headers: { token },
                 });
                 const data = await res.json();
@@ -45,7 +45,7 @@ const TodayPlan = () => {
     const handleMarkDone = async (taskId) => {
         const token = localStorage.getItem("token");
         try {
-            const res = await fetch(`http://localhost:4000/api/plan/${plan._id}/complete`, {
+            const res = await fetch(`https://rantingapp.onrender.com/api/plan/${plan._id}/complete`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

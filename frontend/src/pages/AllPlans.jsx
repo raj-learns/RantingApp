@@ -24,7 +24,7 @@ const AllPlans = () => {
         const fetchPlans = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const res = await fetch("http://localhost:4000/api/myplans", {
+                const res = await fetch("https://rantingapp.onrender.com/api/myplans", {
                     headers: { token },
                 });
                 const data = await res.json();
