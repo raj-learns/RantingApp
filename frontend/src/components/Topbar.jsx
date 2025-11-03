@@ -72,6 +72,9 @@ const TopBar = () => {
             <MenuItem onClick={() => handleNavigation("/createpost")}>
               Create Plan
             </MenuItem>
+            <MenuItem onClick={() => handleNavigation("/profile")}>
+              My Profile
+            </MenuItem>
           </Menu>
         </Box>
       </Toolbar>

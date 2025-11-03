@@ -75,15 +75,16 @@ app.post('/api/plan', async (req, res) => {
     try {
         const decoded = jwt.verify(req.headers.token, 'secret-key');
         if (!decoded) return res.status(401).json({ message: 'Invalid token' });
+
         const planDate = req.body.planDate ? new Date(req.body.planDate) : new Date();
+
         const startOfDay = new Date(planDate.setHours(0, 0, 0, 0));
         const endOfDay = new Date(planDate.setHours(23, 59, 59, 999));
 
         const existingPlan = await Plan.findOne({
             user: decoded._id,
-            planDate: { $gte: startOfDay, $lte: endOfDay }
+            planDate: { $gte: startOfDay, $lte: endOfDay },
         });
-
         if (existingPlan) {
             return res.status(400).json({ message: "You already have a plan for this day!" });
         }
@@ -92,16 +93,106 @@ app.post('/api/plan', async (req, res) => {
             user: decoded._id,
             title: req.body.title,
             planDate,
-            tasks: req.body.tasks || []
+            tasks: req.body.tasks || [],
+        });
+        await newPlan.save();
+
+        const now = new Date();
+        const todayStart = new Date(now.setHours(0, 0, 0, 0));
+        const todayEnd = new Date(now.setHours(23, 59, 59, 999));
+
+        const user = await User.findById(decoded._id);
+        let updates = {};
+
+        if (planDate >= todayStart && planDate <= todayEnd) {
+            if (user.currentPlan) updates.lastPlan = user.currentPlan;
+            updates.currentPlan = newPlan._id;
+            updates.nextPlan = user.nextPlan; 
+        }
+        else if (planDate > todayEnd) {
+            updates.nextPlan = newPlan._id;
+        }
+        else {
+            updates.lastPlan = newPlan._id;
+        }
+        const planIds = [updates.lastPlan, updates.currentPlan, updates.nextPlan].filter(Boolean);
+        if (planIds.length > 1) {
+            updates.lastPlan = planIds[0];
+            if (planIds[1]) updates.currentPlan = planIds[1];
+            if (planIds[2]) updates.nextPlan = planIds[2];
+        }
+
+        await User.findByIdAndUpdate(decoded._id, updates);
+
+        return res.status(201).json({
+            message: 'Plan created successfully and user plan pointers updated',
+            planId: newPlan._id,
+            updates,
         });
 
-        await newPlan.save();
-        await User.findByIdAndUpdate(decoded._id, { nextPlan: newPlan._id });
+    } catch (err) {
+        console.error('Error creating plan:', err);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
 
-        return res.status(201).json({ message: 'Plan created successfully', planId: newPlan._id });
+
+app.get("/api/profile", async (req, res) => {
+    try {
+        const decoded = jwt.verify(req.headers.token, "secret-key");
+        if (!decoded) return res.status(401).json({ message: "Invalid token" });
+
+        const user = await User.findById(decoded._id)
+            .populate("lastPlan currentPlan nextPlan", "title planDate")
+            .select("-password");
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const now = new Date();
+        const todayStart = new Date(now.setHours(0, 0, 0, 0));
+        const todayEnd = new Date(now.setHours(23, 59, 59, 999));
+
+        let updates = {};
+
+        if (user.currentPlan && new Date(user.currentPlan.planDate) < todayStart) {
+            updates.lastPlan = user.currentPlan._id;
+            updates.currentPlan = null;
+        }
+
+        if (
+            user.nextPlan &&
+            new Date(user.nextPlan.planDate) >= todayStart &&
+            new Date(user.nextPlan.planDate) <= todayEnd
+        ) {
+            updates.currentPlan = user.nextPlan._id;
+            updates.nextPlan = null;
+        }
+
+        if (user.nextPlan && new Date(user.nextPlan.planDate) < todayStart) {
+            updates.lastPlan = user.nextPlan._id;
+            updates.nextPlan = null;
+        }
+
+        if (!user.currentPlan) {
+            const todayPlan = await Plan.findOne({
+                user: user._id,
+                planDate: { $gte: todayStart, $lte: todayEnd },
+            });
+            if (todayPlan) updates.currentPlan = todayPlan._id;
+        }
+
+        if (Object.keys(updates).length > 0) {
+            await User.findByIdAndUpdate(user._id, updates);
+            const refreshedUser = await User.findById(user._id)
+                .populate("lastPlan currentPlan nextPlan", "title planDate")
+                .select("-password");
+            return res.status(200).json({ user: refreshedUser, autoFixed: true });
+        }
+
+        res.status(200).json({ user, autoFixed: false });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -115,14 +206,11 @@ app.get('/api/plan/today', async (req, res) => {
         if (!userId) {
             return res.status(401).json({ message: 'User ID missing in token' });
         }
-
-        // Get the current day (start and end range)
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
         const todayEnd = new Date();
         todayEnd.setHours(23, 59, 59, 999);
 
-        // Find today's plan for this user
         const plan = await Plan.findOne({
             user: userId,
             planDate: { $gte: todayStart, $lte: todayEnd },
@@ -132,7 +220,6 @@ app.get('/api/plan/today', async (req, res) => {
             return res.status(404).json({ message: 'No plan found for today.' });
         }
 
-        // Compute quick stats
         const totalTasks = plan.tasks.length;
         const completedTasks = plan.tasks.filter(t => t.completed).length;
         const rewardedTasks = plan.tasks.filter(t => t.completed && t.isRewarded).length;
@@ -278,5 +365,7 @@ app.get('/api/myposts', async (req, res) => {
         return res.status(401).json({ message: "Yo man! we don't know you. Please login" });
     }
 })
+
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

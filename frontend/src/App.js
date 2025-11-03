@@ -8,6 +8,7 @@ import UserPosts from './pages/MyPage.jsx';
 import Post from './pages/TestingPage.jsx';
 import TodayPlan from './pages/TodayPlan.jsx';
 import AllPlans from './pages/AllPlans.jsx';
+import Profile from './pages/Profile.jsx';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path='/todayplan' element={<TodayPlan />} />
         <Route path='/allplans' element={<AllPlans />} />
         <Route path="/editplan/:id" element={<CreatePlan mode="edit" />} />
+        <Route path='/profile' element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
