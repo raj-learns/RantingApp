@@ -136,6 +136,8 @@ app.post('/api/plan', async (req, res) => {
     }
 });
 
+
+
 app.post("/api/follow/:userId", async (req, res) => {
     try {
         const decoded = jwt.verify(req.headers.token, "secret-key");
@@ -223,6 +225,79 @@ app.get("/api/profile", async (req, res) => {
         res.status(200).json({ user, autoFixed: false });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+app.get("/api/user/:userId", async (req, res) => {
+    try {
+        const decoded = jwt.verify(req.headers.token, "secret-key");
+        if (!decoded) return res.status(401).json({ message: "Invalid token" });
+
+        const targetUserId = req.params.userId;
+        const targetUser = await User.findById(targetUserId)
+            .populate("lastPlan currentPlan nextPlan", "title planDate")
+            .select("-password");
+
+        if (!targetUser) return res.status(404).json({ message: "User not found" });
+
+        const recentPlans = await Plan.find({ user: targetUserId })
+            .sort({ planDate: -1 })
+            .limit(3)
+            .select("title planDate tasks");
+
+        const recentPosts = await Post.find({ email: targetUser.email })
+            .sort({ _id: -1 })
+            .limit(3)
+            .select("post createdAt");
+
+        const isFollowing = await User.exists({
+            _id: decoded._id,
+            following: targetUserId,
+        });
+
+        res.status(200).json({
+            user: {
+                _id: targetUser._id,
+                name: targetUser.name,
+                email: targetUser.email,
+                stats: targetUser.stats,
+                followersCount: targetUser.followers.length,
+                followingCount: targetUser.following.length,
+                lastPlan: targetUser.lastPlan,
+                currentPlan: targetUser.currentPlan,
+                nextPlan: targetUser.nextPlan,
+            },
+            recentPlans,
+            recentPosts,
+            isFollowing: !!isFollowing,
+        });
+    } catch (err) {
+        console.error("Error fetching user profile:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+app.get("/api/users/search", async (req, res) => {
+    try {
+        const decoded = jwt.verify(req.headers.token, "secret-key");
+        if (!decoded) return res.status(401).json({ message: "Invalid token" });
+
+        const query = req.query.q?.trim();
+        if (!query) return res.status(400).json({ message: "Search query required" });
+
+        const users = await User.find({
+            $or: [
+                { name: { $regex: query, $options: "i" } },
+                { email: { $regex: query, $options: "i" } },
+            ],
+        })
+            .select("name email followers following stats")
+            .limit(10);
+
+        res.status(200).json({ results: users });
+    } catch (err) {
+        console.error("Error searching users:", err);
         res.status(500).json({ message: "Server error" });
     }
 });
