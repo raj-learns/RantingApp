@@ -9,6 +9,8 @@ import Post from './pages/TestingPage.jsx';
 import TodayPlan from './pages/TodayPlan.jsx';
 import AllPlans from './pages/AllPlans.jsx';
 import Profile from './pages/Profile.jsx';
+import SearchProfiles from './pages/SearchProfiles.jsx';
+import UserProfile from './pages/UserProfile.jsx';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         <Route path='/allplans' element={<AllPlans />} />
         <Route path="/editplan/:id" element={<CreatePlan mode="edit" />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/search' element={<SearchProfiles />} />
+        <Route path='/user/:id' element={<UserProfile />} />
       </Routes>
     </BrowserRouter>
   );
