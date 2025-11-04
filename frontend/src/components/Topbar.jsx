@@ -75,6 +75,9 @@ const TopBar = () => {
             <MenuItem onClick={() => handleNavigation("/search")}>
               Search Profiles
             </MenuItem>
+            <MenuItem onClick={() => handleNavigation("/following")}>
+              People You Follow
+            </MenuItem>
             <MenuItem onClick={() => handleNavigation("/profile")}>
               My Profile
             </MenuItem>

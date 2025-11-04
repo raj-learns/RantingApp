@@ -11,6 +11,7 @@ import AllPlans from './pages/AllPlans.jsx';
 import Profile from './pages/Profile.jsx';
 import SearchProfiles from './pages/SearchProfiles.jsx';
 import UserProfile from './pages/UserProfile.jsx';
+import FollowingProfiles from './pages/FollowingProfiles.jsx';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path='/profile' element={<Profile />} />
         <Route path='/search' element={<SearchProfiles />} />
         <Route path='/user/:id' element={<UserProfile />} />
+        <Route path='/following' element={<FollowingProfiles />} />
       </Routes>
     </BrowserRouter>
   );
