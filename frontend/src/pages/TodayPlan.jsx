@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TopBar from "../components/Topbar";
+import NewDefault from "../assets/bluebg.png"
 import {
     Box,
     Typography,
@@ -23,6 +24,7 @@ import {
     Trophy,
     Calendar,
     Clock,
+    BookText
 } from "lucide-react";
 import downloadImg from "../assets/download.jpeg";
 
@@ -171,7 +173,7 @@ const TodayPlan = () => {
             <Box
                 sx={{
                     minHeight: "100vh",
-                    backgroundImage: "url(${downloadImg}')",
+                    backgroundImage: `url(${downloadImg})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundAttachment: "fixed",
@@ -221,12 +223,12 @@ const TodayPlan = () => {
                     </Paper>
 
                     {/* Stats Cards */}
-                    <Grid container spacing={3} sx={{ mb: 3 }}>
-                        <Grid item xs={12} md={4}>
+                    <Grid container spacing={38} sx={{ mb: 3 }}>
+                        <Grid container spacing={3} alignItems="stretch">
                             <Card
                                 elevation={8}
                                 sx={{
-                                    background: "rgba(255, 255, 255, 0.95)",
+                                    background: "rgba(255, 255, 255, 0.2)",
                                     backdropFilter: "blur(10px)",
                                     borderRadius: 3,
                                     transition: "transform 0.3s",
@@ -243,23 +245,23 @@ const TodayPlan = () => {
                                             mb: 2,
                                         }}
                                     >
-                                        <CheckCircle size={18} />
+                                        <CheckCircle size={30} />
                                     </Avatar>
                                     <Typography variant="h4" fontWeight="bold" color="#4caf50">
                                         {stats.completedTasks}
                                     </Typography>
-                                    <Typography variant="body2" color="#666">
+                                    <Typography variant="body2" color="#ffffff">
                                         Completed Tasks
                                     </Typography>
                                 </CardContent>
                             </Card>
                         </Grid>
 
-                        <Grid item xs={12} md={4}>
+                        <Grid container spacing={3} alignItems="stretch">
                             <Card
                                 elevation={8}
                                 sx={{
-                                    background: "rgba(255, 255, 255, 0.95)",
+                                    background: "rgba(255, 255, 255, 0.2)",
                                     backdropFilter: "blur(10px)",
                                     borderRadius: 3,
                                     transition: "transform 0.3s",
@@ -276,23 +278,23 @@ const TodayPlan = () => {
                                             mb: 2,
                                         }}
                                     >
-                                        <Circle size={18} />
+                                        <BookText size={30} />
                                     </Avatar>
                                     <Typography variant="h4" fontWeight="bold" color="#2196f3">
                                         {stats.totalTasks}
                                     </Typography>
-                                    <Typography variant="body2" color="#666">
+                                    <Typography variant="body2" color="#ffffff">
                                         Total Tasks
                                     </Typography>
                                 </CardContent>
                             </Card>
                         </Grid>
 
-                        <Grid item xs={12} md={4}>
+                        <Grid container spacing={3} alignItems="stretch">
                             <Card
                                 elevation={8}
                                 sx={{
-                                    background: "rgba(255, 255, 255, 0.95)",
+                                    background: "rgba(255, 255, 255, 0.2)",
                                     backdropFilter: "blur(10px)",
                                     borderRadius: 3,
                                     transition: "transform 0.3s",
@@ -314,7 +316,7 @@ const TodayPlan = () => {
                                     <Typography variant="h4" fontWeight="bold" color="#ff9800">
                                         {stats.rewardedTasks}
                                     </Typography>
-                                    <Typography variant="body2" color="#666">
+                                    <Typography variant="body2" color="#ffffff">
                                         Rewards Earned
                                     </Typography>
                                 </CardContent>
@@ -329,11 +331,11 @@ const TodayPlan = () => {
                             p: 3,
                             mb: 3,
                             borderRadius: 4,
-                            background: "rgba(255, 255, 255, 0.95)",
+                            background: "rgba(255, 255, 255, 0.3)",
                             backdropFilter: "blur(10px)",
                         }}
                     >
-                        <Typography variant="h6" gutterBottom fontWeight="bold" color="#667eea">
+                        <Typography variant="h6" gutterBottom fontWeight="bold" color="#ffffffff">
                             Overall Progress
                         </Typography>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -344,15 +346,24 @@ const TodayPlan = () => {
                                     sx={{
                                         height: 12,
                                         borderRadius: 6,
-                                        bgcolor: "#e0e0e0",
+                                        bgcolor: "#ffffff",
                                         "& .MuiLinearProgress-bar": {
-                                            background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
                                             borderRadius: 6,
+                                            background: (() => {
+                                                const value = parseFloat(stats.completionRate);
+
+                                                if (value === 0) return "#ffffff"; 
+                                                if (value < 50) return "#ffeb3b"; 
+                                                if (value < 100) return "#ff9800";
+                                                return "#4caf50"; 
+                                            })(),
+                                            transition: "background 0.3s ease",
                                         },
                                     }}
                                 />
+
                             </Box>
-                            <Typography variant="h6" fontWeight="bold" color="#667eea">
+                            <Typography variant="h6" fontWeight="bold" color="#ffffff">
                                 {stats.completionRate}
                             </Typography>
                         </Box>
@@ -364,11 +375,11 @@ const TodayPlan = () => {
                         sx={{
                             p: 4,
                             borderRadius: 4,
-                            background: "rgba(255, 255, 255, 0.95)",
+                            background: "rgba(255, 255, 255, 0.3)",
                             backdropFilter: "blur(10px)",
                         }}
                     >
-                        <Typography variant="h5" gutterBottom fontWeight="bold" color="#667eea" sx={{ mb: 3 }}>
+                        <Typography variant="h5" gutterBottom fontWeight="bold" color="#ffffff" sx={{ mb: 3 }}>
                             Your Tasks
                         </Typography>
 
@@ -384,7 +395,7 @@ const TodayPlan = () => {
                                     border: task.completed ? "2px solid #4caf50" : "2px solid transparent",
                                     background: task.completed
                                         ? "linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)"
-                                        : "white",
+                                        : `#eee8aa`,
                                     "&:hover": {
                                         transform: "translateX(5px)",
                                         boxShadow: task.completed ? 4 : 12,
@@ -395,7 +406,7 @@ const TodayPlan = () => {
                                     <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
                                         <Avatar
                                             sx={{
-                                                bgcolor: task.completed ? "#4caf50" : "#667eea",
+                                                bgcolor: task.completed ? "#4caf50" : "#63461aff",
                                                 width: 45,
                                                 height: 45,
                                             }}
@@ -413,7 +424,7 @@ const TodayPlan = () => {
                                                 fontWeight="bold"
                                                 sx={{
                                                     textDecoration: task.completed ? "line-through" : "none",
-                                                    color: task.completed ? "#4caf50" : "#333",
+                                                    color: task.completed ? "#4caf50" : "#63461aff",
                                                 }}
                                             >
                                                 {task.description}
@@ -423,14 +434,15 @@ const TodayPlan = () => {
                                                 <Chip
                                                     label={task.field}
                                                     size="small"
-                                                    color="primary"
                                                     variant="outlined"
+                                                    color="#63461aff"
                                                 />
                                                 <Chip
                                                     icon={<Clock />}
                                                     label={`${task.expectedDuration || "N/A"} hrs`}
                                                     size="small"
                                                     variant="outlined"
+                                                    color="#63461aff"
                                                 />
                                             </Box>
 
@@ -440,13 +452,13 @@ const TodayPlan = () => {
                                                         <Checkbox
                                                             onChange={() => handleMarkDone(task._id)}
                                                             sx={{
-                                                                color: "#667eea",
+                                                                color: "#63461aff",
                                                                 "&.Mui-checked": { color: "#4caf50" },
                                                             }}
                                                         />
                                                     }
                                                     label={
-                                                        <Typography fontWeight="500" color="#667eea">
+                                                        <Typography fontWeight="500" color="#63461aff">
                                                             Mark as Done
                                                         </Typography>
                                                     }

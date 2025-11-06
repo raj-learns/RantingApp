@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Menu as MenuIcon } from 'lucide-react';
 
 const TopBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -19,7 +20,7 @@ const TopBar = () => {
       position="sticky"
       elevation={4}
       sx={{
-        bgcolor: "#1976d2",
+        bgcolor: "#eee8aa",
         backdropFilter: "blur(6px)",
       }}
     >
@@ -33,6 +34,7 @@ const TopBar = () => {
             fontWeight: 700,
             letterSpacing: "0.5px",
             cursor: "pointer",
+            color: "#63461aff"
           }}
           onClick={() => navigate("/todayplan")}
         >
@@ -44,11 +46,11 @@ const TopBar = () => {
           <IconButton
             size="large"
             edge="end"
-            color="inherit"
+            color="#63461aff"
             aria-label="menu"
             onClick={handleMenuOpen}
           >
-            Menu
+            <MenuIcon size={36} />
           </IconButton>
           <Menu
             anchorEl={anchorEl}
