@@ -126,7 +126,7 @@ const TodayPlan = () => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        backgroundImage: "url(${downloadImg})",
+                        backgroundImage: `url(${downloadImg})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                         backgroundAttachment: "fixed",
@@ -148,7 +148,7 @@ const TodayPlan = () => {
                             p: 6,
                             borderRadius: 4,
                             textAlign: "center",
-                            background: "rgba(255, 255, 255, 0.95)",
+                            background: "#eee8aa",
                             backdropFilter: "blur(20px)",
                             maxWidth: 500,
                             mx: 2,
@@ -156,10 +156,10 @@ const TodayPlan = () => {
                             zIndex: 1,
                         }}
                     >
-                        <Typography variant="h4" color="#667eea" gutterBottom>
+                        <Typography variant="h4" color="#63461aff" gutterBottom>
                             No Plan Found
                         </Typography>
-                        <Typography variant="body1" color="#555" sx={{ mt: 2 }}>
+                        <Typography variant="body1" color="#63461aff" sx={{ mt: 2 }}>
                             No plan found for today. Create one to get started!
                         </Typography>
                     </Paper>
