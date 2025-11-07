@@ -28,8 +28,6 @@ import {
 } from "lucide-react";
 import downloadImg from "../assets/download.jpeg";
 
-
-
 const TodayPlan = () => {
     const [plan, setPlan] = useState(null);
     const [stats, setStats] = useState({});

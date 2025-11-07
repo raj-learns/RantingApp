@@ -1,7 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Typography, MenuItem, Checkbox, FormControlLabel, Modal } from "@mui/material";
+import {
+    Box,
+    Button,
+    TextField,
+    Typography,
+    MenuItem,
+    Checkbox,
+    FormControlLabel,
+    Modal,
+    Paper, // Added
+    IconButton, // Added
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import TopBar from "../components/Topbar";
+import downloadImg from "../assets/download.jpeg"; // Added
+import {
+    Plus,       // Added
+    Trash2,     // Added
+    Send,       // Added
+    CheckCircle, // Added
+} from "lucide-react"; // Added
+
+// 🎨 sx prop for consistent white/themed text fields
+const textFieldSx = {
+    mb: 2,
+    '& label': { color: '#e0e0e0' },
+    '& label.Mui-focused': { color: '#ffffff' },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.5)' },
+        '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.8)' },
+        '&.Mui-focused fieldset': { borderColor: '#ffffff' },
+    },
+    '& .MuiInputBase-input': {
+        color: '#ffffff',
+    },
+    '& .MuiSelect-icon': { // For dropdown
+        color: 'rgba(255, 255, 255, 0.7)',
+    }
+};
+
+// 🎨 sx prop for date field (to style the calendar icon)
+const dateFieldSx = {
+    ...textFieldSx,
+    '& [type="date"]::-webkit-calendar-picker-indicator': {
+        filter: 'invert(1) opacity(0.7)',
+    }
+};
 
 const CreatePlan = ({ mode }) => {
     const { id } = useParams();
@@ -14,101 +58,108 @@ const CreatePlan = ({ mode }) => {
     ]);
     const [plannedDates, setPlannedDates] = useState([]);
     const navigate = useNavigate();
+
+    // ... (All your existing useEffect and handler logic remains unchanged) ...
+    // ... (useEffect for fetchPlan) ...
     useEffect(() => {
-        if (mode === 'edit' && id) {
-            const fetchPlan = async () => {
-                const token = localStorage.getItem('token');
-                const res = await fetch(`https://rantingapp.onrender.com/api/plan/${id}`, {
-                    headers: { token },
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    setTitle(data.plan.title || '');
-                    setPlanDate(data.plan.planDate?.split("T")[0] || "");
-                    setCurrentPlanDate(data.plan.planDate?.split("T")[0] || "");
-                    setTasks(data.plan.tasks || []);
-                }
-            };
-            fetchPlan();
-        }
-    }, [mode, id]);
+        if (mode === 'edit' && id) {
+            const fetchPlan = async () => {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`https://rantingapp.onrender.com/api/plan/${id}`, {
+                    headers: { token },
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    setTitle(data.plan.title || '');
+                    setPlanDate(data.plan.planDate?.split("T")[0] || "");
+                    setCurrentPlanDate(data.plan.planDate?.split("T")[0] || "");
+                    setTasks(data.plan.tasks || []);
+                }
+            };
+            fetchPlan();
+        }
+    }, [mode, id]);
 
+    // ... (useEffect for fetchPlannedDates) ...
     useEffect(() => {
-        const fetchPlannedDates = async () => {
-            const token = localStorage.getItem('token');
-            try {
-                const res = await fetch('https://rantingapp.onrender.com/api/myplans', {
-                    headers: { 'token': token }
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    const dates = data.plans.map(plan =>
-                        new Date(plan.planDate).toISOString().split("T")[0]
-                    );
-                    setPlannedDates(dates);
-                }
-            } catch (err) {
-                console.error("Error fetching planned dates:", err);
-            }
-        };
-        fetchPlannedDates();
-    }, []);
+        const fetchPlannedDates = async () => {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch('https://rantingapp.onrender.com/api/myplans', {
+                    headers: { 'token': token }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    const dates = data.plans.map(plan =>
+                        new Date(plan.planDate).toISOString().split("T")[0]
+                    );
+                    setPlannedDates(dates);
+                }
+            } catch (err) {
+                console.error("Error fetching planned dates:", err);
+            }
+        };
+        fetchPlannedDates();
+    }, []);
 
-
+    // ... (handleTaskChange) ...
     const handleTaskChange = (index, e) => {
-        const { name, value, type, checked } = e.target;
-        const updatedTasks = [...tasks];
-        updatedTasks[index][name] = type === "checkbox" ? checked : value;
-        setTasks(updatedTasks);
-    };
+        const { name, value, type, checked } = e.target;
+        const updatedTasks = [...tasks];
+        updatedTasks[index][name] = type === "checkbox" ? checked : value;
+        setTasks(updatedTasks);
+    };
 
+    // ... (addTask) ...
     const addTask = () => {
-        setTasks([
-            ...tasks,
-            { description: "", field: "SDE", expectedDuration: "", isRewarded: false },
-        ]);
-    };
+        setTasks([
+            ...tasks,
+            { description: "", field: "SDE", expectedDuration: "", isRewarded: false },
+        ]);
+    };
 
+    // ... (removeTask) ...
     const removeTask = (index) => {
-        const updated = [...tasks];
-        updated.splice(index, 1);
-        setTasks(updated);
-    };
+        const updated = [...tasks];
+        updated.splice(index, 1);
+        setTasks(updated);
+    };
 
+    // ... (handleSubmit) ...
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        const token = localStorage.getItem("token");
+        e.preventDefault();
+        const token = localStorage.getItem("token");
 
-        try {
-            const url =
-                mode === 'edit'
-                    ? `https://rantingapp.onrender.com/api/plan/${id}`
-                    : 'https://rantingapp.onrender.com/api/plan';
-            const method = mode === 'edit' ? 'PUT' : 'POST';
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                    token,
-                },
-                body: JSON.stringify({ title, planDate, tasks }),
-            });
+        try {
+            const url =
+                mode === 'edit'
+                    ? `https://rantingapp.onrender.com/api/plan/${id}`
+                    : 'https://rantingapp.onrender.com/api/plan';
+            const method = mode === 'edit' ? 'PUT' : 'POST';
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                    token,
+                },
+                body: JSON.stringify({ title, planDate, tasks }),
+            });
 
-            const data = await response.json();
-            if (response.status === 201) {
-                setOpenModal(true);
-            }
-            else if (response.status === 200) {
-                setOpenModal(true);
-            } else {
-                alert(data.message);
-            }
+            const data = await response.json();
+            if (response.status === 201) {
+                setOpenModal(true);
+            }
+            else if (response.status === 200) {
+                setOpenModal(true);
+            } else {
+                alert(data.message);
+            }
 
-        } catch (err) {
-            console.error("Error creating plan:", err);
-            alert("Server error while creating plan.");
-        }
-    };
+        } catch (err) {
+            console.error("Error creating plan:", err);
+            alert("Server error while creating plan.");
+        }
+    };
     const isDateBlocked =
         plannedDates.includes(planDate) && planDate !== currentPlanDate;
 
@@ -116,28 +167,48 @@ const CreatePlan = ({ mode }) => {
     return (
         <>
             <TopBar />
+            {/* 🎨 Main Layout Wrapper */}
             <Box
                 sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    bgcolor: "#e9f5ff",
                     minHeight: "100vh",
+                    backgroundImage: `url(${downloadImg})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundAttachment: "fixed",
+                    position: "relative",
                     py: 6,
+                    px: 2,
+                    "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(0, 0, 0, 0.4)",
+                    },
+                    display: "flex", // Added
+                    alignItems: "center", // Added
+                    justifyContent: "center", // Added
                 }}
             >
-                <Box
+                {/* 🎨 Frosted Glass Form Container */}
+                <Paper
+                    elevation={10}
                     sx={{
-                        bgcolor: "white",
-                        p: 5,
+                        background: "rgba(255, 255, 255, 0.3)",
+                        backdropFilter: "blur(10px)",
+                        color: "#ffffff", // Cascade white text
+                        p: { xs: 3, md: 5 },
                         borderRadius: 4,
                         boxShadow: 4,
                         width: "90%",
                         maxWidth: 700,
+                        position: "relative", // For zIndex
+                        zIndex: 1, // Ensure it's above the overlay
                     }}
                 >
-                    <Typography variant="h4" gutterBottom color="#3722c0ff" mb="50px">
+                    <Typography variant="h4" gutterBottom color="inherit" mb={4}>
                         {mode === 'edit' ? '✏️ Edit Plan' : '🗓 Create a New Plan'}
                     </Typography>
 
@@ -148,7 +219,7 @@ const CreatePlan = ({ mode }) => {
                             variant="outlined"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            sx={{ mb: 2 }}
+                            sx={textFieldSx} // 🎨 Applied themed sx
                             required
                         />
 
@@ -158,7 +229,7 @@ const CreatePlan = ({ mode }) => {
                             type="date"
                             value={planDate}
                             onChange={(e) => setPlanDate(e.target.value)}
-                            sx={{ mb: 3 }}
+                            sx={dateFieldSx} // 🎨 Applied themed sx for date
                             InputLabelProps={{ shrink: true }}
                             inputProps={{
                                 min: new Date().toISOString().split("T")[0],
@@ -169,10 +240,12 @@ const CreatePlan = ({ mode }) => {
                                     ? "You already have a plan for this day! Go and edit instead."
                                     : ""
                             }
-
+                            FormHelperTextProps={{ // 🎨 Style helper text
+                                sx: { color: isDateBlocked ? '#ffcdd2' : 'rgba(255,255,255,0.7)' }
+                            }}
                         />
 
-                        <Typography variant="h6" sx={{ mb: 1 }}>
+                        <Typography variant="h6" sx={{ mb: 2, mt: 2, color: 'inherit' }}>
                             Tasks
                         </Typography>
 
@@ -180,13 +253,30 @@ const CreatePlan = ({ mode }) => {
                             <Box
                                 key={index}
                                 sx={{
-                                    border: "1px solid #ccc",
+                                    // 🎨 Inset dark frosted box
+                                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                                    bgcolor: "rgba(0, 0, 0, 0.15)",
                                     borderRadius: 3,
                                     p: 2,
                                     mb: 2,
-                                    bgcolor: "#f9f9f9",
+                                    position: 'relative'
                                 }}
                             >
+                                {tasks.length > 1 && (
+                                    <IconButton
+                                        aria-label="Remove task"
+                                        color="error"
+                                        onClick={() => removeTask(index)}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            bgcolor: 'rgba(0,0,0,0.2)'
+                                        }}
+                                    >
+                                        <Trash2 size={18} />
+                                    </IconButton>
+                                )}
                                 <TextField
                                     label="Task Description"
                                     name="description"
@@ -194,7 +284,7 @@ const CreatePlan = ({ mode }) => {
                                     onChange={(e) => handleTaskChange(index, e)}
                                     fullWidth
                                     required
-                                    sx={{ mb: 2 }}
+                                    sx={{ ...textFieldSx, mt: 1 }} // 🎨 Themed
                                 />
 
                                 <TextField
@@ -204,7 +294,17 @@ const CreatePlan = ({ mode }) => {
                                     value={task.field}
                                     onChange={(e) => handleTaskChange(index, e)}
                                     fullWidth
-                                    sx={{ mb: 2 }}
+                                    sx={textFieldSx} // 🎨 Themed
+                                    SelectProps={{ // 🎨 Style the dropdown menu
+                                        MenuProps: {
+                                            PaperProps: {
+                                                sx: {
+                                                    bgcolor: '#333',
+                                                    color: '#fff'
+                                                }
+                                            }
+                                        }
+                                    }}
                                 >
                                     <MenuItem value="SDE">SDE</MenuItem>
                                     <MenuItem value="Core">Core</MenuItem>
@@ -218,7 +318,7 @@ const CreatePlan = ({ mode }) => {
                                     onChange={(e) => handleTaskChange(index, e)}
                                     fullWidth
                                     type="number"
-                                    sx={{ mb: 2 }}
+                                    sx={{...textFieldSx, mb: 1}} // 🎨 Themed
                                 />
 
                                 <FormControlLabel
@@ -227,36 +327,56 @@ const CreatePlan = ({ mode }) => {
                                             checked={task.isRewarded}
                                             name="isRewarded"
                                             onChange={(e) => handleTaskChange(index, e)}
+                                            // 🎨 Themed checkbox
+                                            sx={{
+                                                color: 'rgba(255, 255, 255, 0.7)',
+                                                '&.Mui-checked': { color: '#4caf50' }, // Green from TodayPlan
+                                            }}
                                         />
                                     }
                                     label="Reward Task"
+                                    sx={{ color: 'inherit' }} // 🎨 White text
                                 />
-
-                                {tasks.length > 1 && (
-                                    <Button
-                                        variant="outlined"
-                                        color="error"
-                                        sx={{ mt: 1 }}
-                                        onClick={() => removeTask(index)}
-                                    >
-                                        Remove Task
-                                    </Button>
-                                )}
                             </Box>
                         ))}
 
                         <Button
                             variant="outlined"
-                            sx={{ mb: 3, mt: 1 }}
+                            color="inherit" // 🎨 White button
+                            sx={{ mb: 3, mt: 1, borderRadius: 2 }}
                             onClick={addTask}
+                            startIcon={<Plus />}
                         >
-                            + Add Another Task
+                            Add Another Task
                         </Button>
 
-                        <Button type="submit" variant="contained" fullWidth disabled={isDateBlocked}>
-                            Submit Plan
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            fullWidth
+                            disabled={isDateBlocked}
+                            startIcon={<Send />}
+                            // 🎨 Themed gradient button
+                            sx={{
+                                py: 1.5,
+                                borderRadius: 3,
+                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                fontWeight: "bold",
+                                fontSize: "1.1rem",
+                                "&:hover": {
+                                    background: "linear-gradient(135deg, #764ba2 0%, #667eea 100%)",
+                                },
+                                '&.Mui-disabled': { // Style for disabled
+                                    background: 'rgba(0,0,0,0.12)',
+                                    color: 'rgba(255,255,255,0.3)'
+                                }
+                            }}
+                        >
+                            {mode === 'edit' ? 'Update Plan' : 'Submit Plan'}
                         </Button>
                     </form>
+
+                    {/* 🎨 Styled Modal */}
                     <Modal
                         open={openModal}
                         onClose={() => {
@@ -272,32 +392,44 @@ const CreatePlan = ({ mode }) => {
                                 top: "50%",
                                 left: "50%",
                                 transform: "translate(-50%, -50%)",
-                                width: 400,
-                                bgcolor: "#fff",
-                                borderRadius: 3,
+                                width: { xs: '90%', sm: 400 },
+                                bgcolor: "#ffffff", // White background
+                                borderRadius: 4,    // Consistent radius
                                 boxShadow: 24,
                                 p: 4,
                                 textAlign: "center",
                             }}
                         >
-                            <Typography id="plan-created-modal" variant="h6" component="h2" mb={2}>
-                                🌟 Great Job!
+                            <CheckCircle size={48} color="#4caf50" style={{ marginBottom: 16 }} />
+                            <Typography id="plan-created-modal" variant="h6" component="h2" mb={2} fontWeight="bold">
+                                {mode === 'edit' ? 'Plan Updated!' : '🌟 Great Job!'}
                             </Typography>
-                            <Typography id="motivational-message" mb={3}>
-                                You’ve just created a new plan for your success. Keep the consistency alive — one step at a time!
+                            <Typography id="motivational-message" mb={3} color="text.secondary">
+                                {mode === 'edit'
+                                 ? 'Your plan has been successfully updated. Keep up the momentum!'
+                                 : 'You’ve just created a new plan for your success. Keep the consistency alive!'
+                                }
                             </Typography>
 
                             <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
                                 <Button
                                     variant="contained"
-                                    color="primary"
                                     onClick={() => navigate('/allplans')}
+                                    // 🎨 Consistent gradient button
+                                    sx={{
+                                        borderRadius: 2,
+                                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                        "&:hover": {
+                                            background: "linear-gradient(135deg, #764ba2 0%, #667eea 100%)",
+                                        },
+                                    }}
                                 >
                                     View All Plans
                                 </Button>
                                 <Button
                                     variant="outlined"
-                                    color="success"
+                                    color="primary"
+                                    sx={{ borderRadius: 2 }}
                                     onClick={() => navigate('/todayplan')}
                                 >
                                     Go to Today’s Plan
@@ -306,7 +438,7 @@ const CreatePlan = ({ mode }) => {
                         </Box>
                     </Modal>
 
-                </Box>
+                </Paper>
             </Box>
         </>
     );
