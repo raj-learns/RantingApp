@@ -31,6 +31,11 @@ const textFieldSx = {
     },
     '& .MuiInputBase-input': {
         color: '#ffffff',
+        '&:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus, &:-webkit-autofill:active': {
+            WebkitTextFillColor: '#ffffff', // Force the text to be white
+            transition: 'background-color 5000s ease-in-out 0s', // Trick to "delay" the white background
+            caretColor: '#ffffff',
+        },
     },
 };
 
