@@ -6,15 +6,27 @@ import {
     Card,
     CardContent,
     Button,
-    CircularProgress,
     Grid,
     Chip,
     Modal,
     IconButton,
     Fade,
+    Paper,            // Added
+    LinearProgress,   // Added
+    Avatar,           // Added
+    Divider,          // Added
 } from "@mui/material";
 import TopBar from "../components/Topbar";
-
+import downloadImg from "../assets/download.jpeg"; // Added
+import {
+    User,             // Added
+    Check,            // Added
+    Plus,             // Added
+    X,                // Added
+    Calendar,         // Added
+    Clock,            // Added
+    BookText,         // Added
+} from "lucide-react"; // Added
 
 const UserProfile = () => {
     const { id } = useParams();
@@ -25,6 +37,8 @@ const UserProfile = () => {
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [openModal, setOpenModal] = useState(false);
 
+    // ... (All your existing useEffect and handler logic remains unchanged) ...
+    // ... (useEffect for fetchProfile) ...
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -50,6 +64,7 @@ const UserProfile = () => {
         fetchProfile();
     }, [id]);
 
+    // ... (fetchPlanDetails) ...
     const fetchPlanDetails = async (planId) => {
         try {
             const token = localStorage.getItem("token");
@@ -64,6 +79,7 @@ const UserProfile = () => {
         }
     };
 
+    // ... (handleOpenModal) ...
     const handleOpenModal = async (plan) => {
         if (!plan || !plan._id) return;
         const fullPlan = await fetchPlanDetails(plan._id);
@@ -71,14 +87,13 @@ const UserProfile = () => {
         setOpenModal(true);
     };
 
-
+    // ... (handleCloseModal) ...
     const handleCloseModal = () => {
         setOpenModal(false);
         setTimeout(() => setSelectedPlan(null), 300);
     };
 
-    console.log("User Data:", user);
-
+    // ... (handleFollowToggle) ...
     const handleFollowToggle = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -90,8 +105,10 @@ const UserProfile = () => {
             if (res.ok) {
                 setIsFollowing((prev) => !prev);
                 const myId = JSON.parse(atob(token.split(".")[1]))?._id;
+                // Update follower count locally for instant feedback
                 setUser((prev) => ({
                     ...prev,
+                    followersCount: isFollowing ? prev.followersCount - 1 : prev.followersCount + 1,
                     followers: isFollowing
                         ? (prev.followers || []).filter(f => f !== myId)
                         : [...(prev.followers || []), myId],
@@ -103,128 +120,263 @@ const UserProfile = () => {
         }
     };
 
-
+    // 🎨 Styled Loading State
     if (loading)
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-                <CircularProgress />
-            </Box>
+            <>
+                <TopBar />
+                <Box
+                    sx={{
+                        minHeight: "100vh",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    }}
+                >
+                    <Paper
+                        elevation={10}
+                        sx={{
+                            p: 5,
+                            borderRadius: 4,
+                            textAlign: "center",
+                            background: "rgba(255, 255, 255, 0.95)",
+                            backdropFilter: "blur(10px)",
+                        }}
+                    >
+                        <Typography variant="h5" color="#667eea" gutterBottom>
+                            Loading profile...
+                        </Typography>
+                        <LinearProgress sx={{ mt: 2, borderRadius: 2 }} />
+                    </Paper>
+                </Box>
+            </>
         );
 
+    // 🎨 Styled Empty State
     if (!user)
         return (
-            <Box textAlign="center" mt={6}>
-                <Typography variant="h6" color="error">
-                    User not found.
-                </Typography>
-            </Box>
+            <>
+                <TopBar />
+                <Box
+                    sx={{
+                        minHeight: "100vh",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundImage: `url(${downloadImg})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundAttachment: "fixed",
+                        position: "relative",
+                        "&::before": {
+                            content: '""',
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        },
+                    }}
+                >
+                    <Paper
+                        elevation={20}
+                        sx={{
+                            p: 6,
+                            borderRadius: 4,
+                            textAlign: "center",
+                            background: "#eee8aa",
+                            backdropFilter: "blur(20px)",
+                            maxWidth: 500,
+                            mx: 2,
+                            position: "relative",
+                            zIndex: 1,
+                        }}
+                    >
+                        <Typography variant="h4" color="#63461aff" gutterBottom>
+                            User Not Found
+                        </Typography>
+                        <Typography variant="body1" color="#63461aff" sx={{ mt: 2 }}>
+                            This profile could not be loaded or may not exist.
+                        </Typography>
+                    </Paper>
+                </Box>
+            </>
         );
 
-    const gradients = [
-        "linear-gradient(135deg, #A1C4FD 0%, #C2E9FB 100%)",
-        "linear-gradient(135deg, #F6D365 0%, #FDA085 100%)",
-        "linear-gradient(135deg, #84FAB0 0%, #8FD3F4 100%)",
-        "linear-gradient(135deg, #FCCB90 0%, #D57EEB 100%)",
-        "linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%)",
-    ];
+    // Helper for simple stat cards
+    const SimpleStat = ({ label, value }) => (
+        <Grid item xs={6} md={3}>
+            <Paper
+                elevation={6}
+                sx={{
+                    p: 2,
+                    textAlign: 'center',
+                    background: "rgba(255, 255, 255, 0.2)",
+                    backdropFilter: "blur(10px)",
+                    borderRadius: 3,
+                    color: '#ffffff',
+                }}
+            >
+                <Typography variant="h5" fontWeight="bold">{value}</Typography>
+                <Typography variant="body2" sx={{ opacity: 0.8 }}>{label}</Typography>
+            </Paper>
+        </Grid>
+    );
 
     return (
         <>
             <TopBar />
-            <Box sx={{ bgcolor: "#f9fafc", minHeight: "100vh", p: 4 }}>
-                {/* Header Section */}
-                <Box textAlign="center" mb={4}>
-                    <Typography variant="h3" fontWeight={700} color="primary">
-                        {user.name}
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary">
-                        {user.email}
-                    </Typography>
-
-                    <Box display="flex" justifyContent="center" gap={3} mt={2}>
-                        <Chip label={`Followers: ${user.followersCount}`} color="primary" />
-                        <Chip label={`Following: ${user.followingCount}`} color="secondary" />
-                        <Chip
-                            label={`Rewards: ${user.stats?.totalRewards ?? 0}`}
-                            color="success"
-                        />
-                    </Box>
-{/* 
-                    <Button
-                        variant={isFollowing ? "contained" : "outlined"}
-                        color={isFollowing ? "success" : "primary"}
-                        onClick={handleFollowToggle}
-                        sx={{ mt: 3 }}
-                    >
-                        {isFollowing ? "Following" : "Follow"}
-                    </Button> */}
-                </Box>
-
-                {/* Stats Section */}
+            {/* 🎨 Main Layout Wrapper */}
+            <Box
+                sx={{
+                    minHeight: "100vh",
+                    backgroundImage: `url(${downloadImg})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundAttachment: "fixed",
+                    position: "relative",
+                    py: 6,
+                    px: 2,
+                    "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(0, 0, 0, 0.4)",
+                    },
+                }}
+            >
+                {/* 🎨 Centered Content Box */}
                 <Box
-                    display="flex"
-                    justifyContent="center"
-                    gap={3}
-                    flexWrap="wrap"
-                    mb={4}
+                    sx={{
+                        position: "relative",
+                        zIndex: 1,
+                        maxWidth: 1000,
+                        mx: "auto",
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 3
+                    }}
                 >
-                    <Card sx={{ p: 2, boxShadow: 4 }}>
-                        <Typography variant="subtitle1" color="textSecondary">
-                            Total Tasks Done
+                    {/* 🎨 "Different" Profile Header Card */}
+                    <Paper
+                        elevation={10}
+                        sx={{
+                            p: { xs: 3, md: 4 },
+                            borderRadius: 4,
+                            background: "rgba(255, 255, 255, 0.3)",
+                            backdropFilter: "blur(10px)",
+                            color: "white",
+                            textAlign: 'center'
+                        }}
+                    >
+                        <Avatar sx={{ width: 80, height: 80, mx: 'auto', mb: 2, bgcolor: 'rgba(255,255,255,0.2)' }}>
+                            <User size={40} />
+                        </Avatar>
+                        <Typography variant="h3" fontWeight={700}>
+                            {user.name}
                         </Typography>
-                        <Typography variant="h5">{user.stats?.totalTasksDone ?? 0}</Typography>
-                    </Card>
-                    <Card sx={{ p: 2, boxShadow: 4 }}>
-                        <Typography variant="subtitle1" color="textSecondary">
-                            SDE Tasks
+                        <Typography variant="body1" sx={{ opacity: 0.8, mb: 3 }}>
+                            {user.email}
                         </Typography>
-                        <Typography variant="h5">{user.stats?.sdeTasksDone ?? 0}</Typography>
-                    </Card>
-                    <Card sx={{ p: 2, boxShadow: 4 }}>
-                        <Typography variant="subtitle1" color="textSecondary">
-                            Core Tasks
-                        </Typography>
-                        <Typography variant="h5">{user.stats?.coreTasksDone ?? 0}</Typography>
-                    </Card>
-                    <Card sx={{ p: 2, boxShadow: 4 }}>
-                        <Typography variant="subtitle1" color="textSecondary">
-                            Non-Core Tasks
-                        </Typography>
-                        <Typography variant="h5">{user.stats?.nonCoreTasksDone ?? 0}</Typography>
-                    </Card>
-                </Box>
 
-                {/* Plans Section */}
-                <Typography variant="h5" fontWeight={600} mb={3}>
-                    📅 Plans by {user.name}
-                </Typography>
+                        {isFollowing ? (
+                            <Button
+                                variant="contained"
+                                startIcon={<Check />}
+                                onClick={handleFollowToggle}
+                                sx={{
+                                    borderRadius: 3,
+                                    bgcolor: '#4caf50', // Green
+                                    fontWeight: "bold",
+                                    "&:hover": { bgcolor: '#388e3c' }
+                                }}
+                            >
+                                Following
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                startIcon={<Plus />}
+                                onClick={handleFollowToggle}
+                                sx={{
+                                    borderRadius: 3,
+                                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                    fontWeight: "bold",
+                                    "&:hover": {
+                                        background: "linear-gradient(135deg, #764ba2 0%, #667eea 100%)",
+                                    }
+                                }}
+                            >
+                                Follow
+                            </Button>
+                        )}
 
-                <Grid container spacing={3} justifyContent="center">
-                    {plans?.length > 0 ? (
-                        plans.map((plan, index) => {
-                            const date = new Date(plan.planDate).toLocaleDateString("en-IN", {
-                                weekday: "short",
-                                day: "numeric",
-                                month: "short",
-                            });
-                            return (
+                        <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)', my: 3 }} />
+
+                        <Box display="flex" justifyContent="center" gap={2} flexWrap="wrap">
+                            <Chip
+                                label={`Followers: ${user.followersCount}`}
+                                variant="outlined"
+                                sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.7)' }}
+                            />
+                            <Chip
+                                label={`Following: ${user.followingCount}`}
+                                variant="outlined"
+                                sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.7)' }}
+                            />
+                            <Chip
+                                label={`Rewards: ${user.stats?.totalRewards ?? 0}`}
+                                variant="outlined"
+                                sx={{ color: '#ff9800', borderColor: '#ff9800' }} // Highlight rewards
+                            />
+                        </Box>
+                    </Paper>
+
+                    {/* 🎨 "Different" Stats Section */}
+                    <Grid container spacing={21}>
+                        <SimpleStat label="Total Tasks Done" value={user.stats?.totalTasksDone ?? 0} />
+                        <SimpleStat label="SDE Tasks" value={user.stats?.sdeTasksDone ?? 0} />
+                        <SimpleStat label="Core Tasks" value={user.stats?.coreTasksDone ?? 0} />
+                        <SimpleStat label="Non-Core Tasks" value={user.stats?.nonCoreTasksDone ?? 0} />
+                    </Grid>
+
+                    {/* 🎨 Consistent Plans Section */}
+                    <Typography variant="h5" fontWeight={600} color="white" sx={{ mb: -1 }}>
+                        📅 Plans by {user.name}
+                    </Typography>
+
+                    <Grid container spacing={3}>
+                        {plans?.length > 0 ? (
+                            plans.map((plan) => (
                                 <Grid item xs={12} sm={6} md={4} key={plan._id}>
                                     <Card
                                         onClick={() => handleOpenModal(plan)}
                                         sx={{
-                                            borderRadius: 4,
+                                            cursor: "pointer",
+                                            borderRadius: 3,
                                             boxShadow: 6,
-                                            background: gradients[index % gradients?.length],
                                             transition: "0.3s",
+                                            background: "#eee8aa", // Golden theme
+                                            color: "#63461aff",
+                                            height: "100%",
                                             "&:hover": {
                                                 transform: "translateY(-6px)",
                                                 boxShadow: 10,
                                             },
                                         }}
                                     >
-                                        <CardContent sx={{ textAlign: "center", color: "#fff" }}>
+                                        <CardContent sx={{ textAlign: "center" }}>
                                             <Typography variant="h5" fontWeight={700}>
-                                                {date}
+                                                {new Date(plan.planDate).toLocaleDateString("en-IN", {
+                                                    weekday: "short",
+                                                    day: "numeric",
+                                                    month: "short",
+                                                })}
                                             </Typography>
                                             <Typography variant="subtitle1" mt={1}>
                                                 {plan.title || "Untitled Plan"}
@@ -232,100 +384,144 @@ const UserProfile = () => {
                                         </CardContent>
                                     </Card>
                                 </Grid>
-                            );
-                        })
-                    ) : (
-                        <Typography variant="body1" color="textSecondary">
-                            No plans yet 😅
-                        </Typography>
-                    )}
-                </Grid>
-                <Modal open={openModal} onClose={handleCloseModal}>
-                    <Fade in={openModal}>
-                        <Box
-                            sx={{
-                                position: "absolute",
-                                top: "50%",
-                                left: "50%",
-                                transform: "translate(-50%, -50%)",
-                                width: 480,
-                                bgcolor: "#ffffff",
-                                borderRadius: 4,
-                                boxShadow: 24,
-                                p: 4,
-                                maxHeight: "80vh",
-                                overflowY: "auto",
-                                borderTop: "6px solid #2196f3",
-                            }}
-                        >
-                            {selectedPlan && (
-                                <>
-                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                        <Typography variant="h6" color="primary">
-                                            {new Date(selectedPlan.planDate).toLocaleDateString("en-IN", {
-                                                weekday: "long",
-                                                day: "numeric",
-                                                month: "long",
-                                            })}
-                                        </Typography>
-                                    </Box>
+                            ))
+                        ) : (
+                            <Grid item xs={12}>
+                                <Paper
+                                    sx={{
+                                        p: 4,
+                                        textAlign: 'center',
+                                        background: "rgba(255, 255, 255, 0.3)",
+                                        backdropFilter: "blur(10px)",
+                                        borderRadius: 3,
+                                        color: '#ffffff',
+                                    }}
+                                >
+                                    <Typography variant="body1">
+                                        This user hasn't made any public plans yet 😅
+                                    </Typography>
+                                </Paper>
+                            </Grid>
+                        )}
+                    </Grid>
 
-                                    {/* Task List */}
-                                    {selectedPlan.tasks && selectedPlan.tasks.length > 0 ? (
-                                        selectedPlan.tasks.map((task, i) => (
-                                            <Box
-                                                key={i}
-                                                sx={{
-                                                    p: 2,
-                                                    mb: 2,
-                                                    borderRadius: 3,
-                                                    backgroundColor: task.completed ? "#d1e7dd" : "#fff3cd",
-                                                    borderLeft: task.isRewarded
-                                                        ? "6px solid #4caf50"
-                                                        : "4px solid #ccc",
-                                                    boxShadow: 2,
-                                                }}
-                                            >
-                                                <Typography fontWeight={600} mb={0.5}>
-                                                    {task.description}
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary">
-                                                    Duration: {task.expectedDuration || "N/A"} hours
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary">
-                                                    Field: {task.field}
-                                                </Typography>
-                                                {task.isRewarded && (
+                    {/* 🎨 Consistent Modal */}
+                    <Modal open={openModal} onClose={handleCloseModal} closeAfterTransition>
+                        <Fade in={openModal}>
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    top: "50%",
+                                    left: "50%",
+                                    transform: "translate(-50%, -50%)",
+                                    width: { xs: '90%', sm: 480 },
+                                    bgcolor: "#ffffff",
+                                    borderRadius: 4,
+                                    boxShadow: 24,
+                                    p: 4,
+                                    maxHeight: "80vh",
+                                    overflowY: "auto",
+                                }}
+                            >
+                                <IconButton
+                                    onClick={handleCloseModal}
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 8,
+                                        right: 8,
+                                        color: 'grey.500'
+                                    }}
+                                >
+                                    <X />
+                                </IconButton>
+
+                                {selectedPlan && (
+                                    <>
+                                        <Box display="flex" alignItems="center" gap={1.5} mb={2}>
+                                            <Avatar sx={{ bgcolor: 'primary.main' }}><Calendar /></Avatar>
+                                            <Typography variant="h6" color="primary" fontWeight="bold">
+                                                {new Date(selectedPlan.planDate).toLocaleDateString("en-IN", {
+                                                    weekday: "long",
+                                                    day: "numeric",
+                                                    month: "long",
+                                                })}
+                                            </Typography>
+                                        </Box>
+
+                                        {/* Task List */}
+                                        {selectedPlan.tasks && selectedPlan.tasks.length > 0 ? (
+                                            selectedPlan.tasks.map((task, i) => (
+                                                <Box
+                                                    key={i}
+                                                    sx={{
+                                                        p: 2,
+                                                        mb: 2,
+                                                        borderRadius: 3,
+                                                        backgroundColor: task.completed ? "#d4edda" : "#eee8aa",
+                                                        color: task.completed ? 'inherit' : '#63461aff',
+                                                        borderLeft: task.isRewarded
+                                                            ? "6px solid #4caf50"
+                                                            : "4px solid #ccc",
+                                                        boxShadow: 2,
+                                                    }}
+                                                >
+                                                    <Typography fontWeight={600} mb={0.5}>
+                                                        {task.description}
+                                                    </Typography>
                                                     <Chip
-                                                        label="⭐ Rewarded Task"
-                                                        color="success"
+                                                        icon={<Clock size={16} />}
+                                                        label={`${task.expectedDuration || "N/A"} hours`}
                                                         size="small"
-                                                        sx={{ mt: 1 }}
+                                                        variant="outlined"
+                                                        sx={{ mr: 1, color: 'inherit', borderColor: 'rgba(0,0,0,0.23)' }}
                                                     />
-                                                )}
-                                            </Box>
-                                        ))
-                                    ) : (
-                                        <Typography variant="body2" color="textSecondary">
-                                            No tasks available for this plan.
-                                        </Typography>
-                                    )}
+                                                    <Chip
+                                                        icon={<BookText size={16} />}
+                                                        label={task.field}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        sx={{ color: 'inherit', borderColor: 'rgba(0,0,0,0.23)' }}
+                                                    />
+                                                    {task.isRewarded && (
+                                                        <Chip
+                                                            label="⭐ Rewarded Task"
+                                                            color="success"
+                                                            size="small"
+                                                            sx={{ mt: 1, display: 'flex' }}
+                                                        />
+                                                    )}
+                                                </Box>
+                                            ))
+                                        ) : (
+                                            <Typography variant="body2" color="textSecondary">
+                                                No tasks available for this plan.
+                                            </Typography>
+                                        )}
 
-                                    {/* Close Button */}
-                                    <Button
-                                        onClick={handleCloseModal}
-                                        fullWidth
-                                        variant="contained"
-                                        color="primary"
-                                        sx={{ mt: 2 }}
-                                    >
-                                        Close
-                                    </Button>
-                                </>
-                            )}
-                        </Box>
-                    </Fade>
-                </Modal>
+                                        <Button
+                                            onClick={handleCloseModal}
+                                            fullWidth
+                                            variant="contained"
+                                            size="large"
+                                            sx={{
+                                                mt: 3,
+                                                py: 1.5,
+                                                borderRadius: 3,
+                                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                                fontWeight: "bold",
+                                                "&:hover": {
+                                                    background: "linear-gradient(135deg, #764ba2 0%, #667eea 100%)",
+                                                },
+                                            }}
+                                        >
+                                            Close
+                                        </Button>
+                                    </>
+                                )}
+                            </Box>
+                        </Fade>
+                    </Modal>
+                </Box>
             </Box>
         </>
     );
