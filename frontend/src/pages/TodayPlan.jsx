@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import TopBar from "../components/Topbar";
-import NewDefault from "../assets/bluebg.png"
 import {
     Box,
     Typography,
@@ -9,7 +8,6 @@ import {
     Checkbox,
     FormControlLabel,
     Paper,
-    Divider,
     Chip,
     Card,
     CardContent,
@@ -20,7 +18,6 @@ import {
 } from "@mui/material";
 import {
     CheckCircle,
-    Circle,
     Trophy,
     Calendar,
     Clock,
