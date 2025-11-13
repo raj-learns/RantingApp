@@ -101,7 +101,7 @@ const UserProfile = () => {
                 method: "POST",
                 headers: { token },
             });
-            const data = await res.json();
+            
             if (res.ok) {
                 setIsFollowing((prev) => !prev);
                 const myId = JSON.parse(atob(token.split(".")[1]))?._id;

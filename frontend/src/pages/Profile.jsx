@@ -6,7 +6,6 @@ import {
     Box,
     Button,
     Divider,
-    Tooltip,
     Modal,
     Fade,
     Chip,

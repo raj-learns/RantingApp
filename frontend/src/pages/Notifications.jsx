@@ -12,12 +12,9 @@ import {
     Tooltip,
     Button
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import downloadImg from "../assets/download.jpeg";
 import {
     Bell,
-    UserPlus,
-    CheckCircle,
     X,
 } from "lucide-react";
 
@@ -40,7 +37,6 @@ const formatTimeAgo = (dateString) => {
 const NotificationPage = () => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchNotifications = async () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert"; // Changed from MuiAlert
 import TopBar from "../components/Topbar";
@@ -36,68 +36,68 @@ const SearchProfiles = () => {
     // ... (All your existing handler logic remains unchanged) ...
     // ... (handleSearch) ...
     const handleSearch = async (e) => {
-        const value = e.target.value;
-        setQuery(value);
+        const value = e.target.value;
+        setQuery(value);
 
-        if (value.trim().length === 0) {
-            setResults([]);
-            setLoading(false); // Stop loading if query is cleared
-            return;
-        }
+        if (value.trim().length === 0) {
+            setResults([]);
+            setLoading(false); // Stop loading if query is cleared
+            return;
+        }
 
-        setLoading(true);
-        try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(
-                `https://rantingapp.onrender.com/api/users/search?q=${value}`,
-                {
-                    headers: { token },
-                }
-            );
-            const data = await res.json();
-            if (res.ok) {
-                const myId = JSON.parse(atob(localStorage.getItem("token").split(".")[1]))?._id;
-                const enriched = data.results.map((u) => ({
-                    ...u,
-                    isFollowing: u.followers?.includes(myId),
-                }));
-                setResults(enriched);
-            }
+        setLoading(true);
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(
+                `https://rantingapp.onrender.com/api/users/search?q=${value}`,
+                {
+                    headers: { token },
+                }
+            );
+            const data = await res.json();
+            if (res.ok) {
+                const myId = JSON.parse(atob(localStorage.getItem("token").split(".")[1]))?._id;
+                const enriched = data.results.map((u) => ({
+                    ...u,
+                    isFollowing: u.followers?.includes(myId),
+                }));
+                setResults(enriched);
+            }
 
-            else setResults([]);
-        } catch (error) {
-            console.error("Error searching users:", error);
-        }
-        setLoading(false);
-    };
+            else setResults([]);
+        } catch (error) {
+            console.error("Error searching users:", error);
+        }
+        setLoading(false);
+    };
 
     // ... (handleFollow) ...
     const handleFollow = async (userId) => {
-        try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(
-                `https://rantingapp.onrender.com/api/follow/${userId}`,
-                {
-                    method: "POST",
-                    headers: { token },
-                }
-            );
-            const data = await res.json();
-            if (res.ok) {
-                showToast(data.message);
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(
+                `https://rantingapp.onrender.com/api/follow/${userId}`,
+                {
+                    method: "POST",
+                    headers: { token },
+                }
+            );
+            const data = await res.json();
+            if (res.ok) {
+                showToast(data.message);
                 // 🎨 Refresh the specific user instead of the whole search
-                setResults(prevResults => 
-                    prevResults.map(user => 
-                        user._id === userId 
-                        ? { ...user, isFollowing: !user.isFollowing } 
-                        : user
+                setResults(prevResults =>
+                    prevResults.map(user =>
+                        user._id === userId
+                            ? { ...user, isFollowing: !user.isFollowing }
+                            : user
                     )
                 );
-            }
-        } catch (error) {
-            console.error("Error following user:", error);
-        }
-    };
+            }
+        } catch (error) {
+            console.error("Error following user:", error);
+        }
+    };
 
     // 🎨 Helper to render main content based on state
     const renderContent = () => {
@@ -226,7 +226,7 @@ const SearchProfiles = () => {
 
         // 🎨 Initial empty state
         return (
-             <Paper
+            <Paper
                 elevation={10}
                 sx={{
                     p: { xs: 4, md: 6 },
@@ -336,7 +336,7 @@ const SearchProfiles = () => {
                     {renderContent()}
 
                 </Box>
-                
+
                 {/* Snackbar for follow/unfollow feedback */}
                 <Snackbar
                     open={snackbar.open}
