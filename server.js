@@ -6,6 +6,7 @@ import './db.js';
 import Post from './models/Posts.js';
 import cors from 'cors';
 import Plan from './models/Plan.js';
+import Notification from './models/Notification.js';
 
 const app = express();
 const saltRounds = 10;
@@ -69,6 +70,14 @@ app.post('/api/post', async (req, res) => {
     else {
         return res.status(401).json({ message: "Yo man! we don't know you. Please login" });
     }
+})
+
+app.post('/api/notification', async (req, res) => {
+    const createdAt = Date.now();
+    const notificationData = { message: req.body.message, createdAt: createdAt, dealdLine: req.body.dealdLine, applyLink: req.body.applyLink }
+    const newNotification = new Notification(notificationData);
+    await newNotification.save();
+    return res.status(201).json({ message: 'Notification added successfully', notificationData: newNotification })
 })
 
 app.post('/api/plan', async (req, res) => {
@@ -169,7 +178,6 @@ app.post("/api/follow/:userId", async (req, res) => {
     }
 });
 
-
 app.get("/api/profile", async (req, res) => {
     try {
         const decoded = jwt.verify(req.headers.token, "secret-key");
@@ -228,6 +236,40 @@ app.get("/api/profile", async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+app.get("/api/notifications", async (req, res) => {
+    try {
+        const notifications = await Notification.find();
+
+        const today = new Date();
+
+        // Process notifications
+        const validNotifications = notifications
+            .map((n) => {
+                const createdAt = new Date(n.createdAt);
+                let deadline = n.deadLine ? new Date(n.deadLine) : null;
+
+                // Assign 10 days deadline if missing
+                if (!deadline || isNaN(deadline.getTime())) {
+                    deadline = new Date(createdAt.getTime() + 10 * 24 * 60 * 60 * 1000);
+                }
+
+                return {
+                    ...n.toObject(),
+                    deadLine: deadline
+                };
+            })
+            .filter((n) => new Date(n.deadLine) >= today) // Only future deadlines
+            .sort((a, b) => new Date(a.deadLine) - new Date(b.deadLine)); // Sort soonest first
+
+        res.status(200).json({ notifications: validNotifications });
+
+    } catch (err) {
+        console.error("Error fetching notifications:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
 
 app.get("/api/user/:userId", async (req, res) => {
     try {
