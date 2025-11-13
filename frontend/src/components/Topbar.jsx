@@ -18,6 +18,7 @@ import {
   Search,
   Users,
   User,
+  Bell,
   LogOut
 } from 'lucide-react';
 
@@ -80,7 +81,14 @@ const TopBar = () => {
         </Typography>
 
         {/* Right side menu icon */}
-        <Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <IconButton
+            size="large"
+            onClick={() => navigate("/updates")}
+            sx={{ color: "#63461aff" }}
+          >
+            <Bell size={26} />
+          </IconButton>
           <IconButton
             size="large"
             edge="end"

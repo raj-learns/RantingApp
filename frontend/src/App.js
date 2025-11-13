@@ -1,5 +1,5 @@
 import './App.css';
-import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Welcome from './pages/Welcome.jsx';
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
@@ -12,6 +12,7 @@ import Profile from './pages/Profile.jsx';
 import SearchProfiles from './pages/SearchProfiles.jsx';
 import UserProfile from './pages/UserProfile.jsx';
 import FollowingProfiles from './pages/FollowingProfiles.jsx';
+import NotificationPage from './pages/Notifications.jsx';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
         <Route path='/' element={<Welcome />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/createpost' element={<CreatePlan mode="create"/>} />
+        <Route path='/createpost' element={<CreatePlan mode="create" />} />
         <Route path='/myposts' element={<UserPosts />} />
         <Route path='/post' element={<Post />} />
         <Route path='/todayplan' element={<TodayPlan />} />
@@ -30,6 +31,7 @@ function App() {
         <Route path='/search' element={<SearchProfiles />} />
         <Route path='/user/:id' element={<UserProfile />} />
         <Route path='/following' element={<FollowingProfiles />} />
+        <Route path='/updates' element={<NotificationPage />} />
       </Routes>
     </BrowserRouter>
   );
